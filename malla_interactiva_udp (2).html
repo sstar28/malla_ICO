@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Interactiva Ingeniería Comercial UDP</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff0f5;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #c71585;
+    }
+    h2 {
+      color: #db3e7e;
+      margin-top: 30px;
+    }
+    .semestre {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .ramo {
+      padding: 10px;
+      background-color: #ffe4ec;
+      border: 2px solid #c71585;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .ramo.done {
+      background-color: #ffc0cb;
+      text-decoration: line-through;
+    }
+    .ramo.locked {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Malla Interactiva Ingeniería Comercial UDP</h1>
+  <div id="contenedor"></div>
+
+  <script>
+    const semestres = [
+      {
+        nombre: "Semestre I",
+        ramos: [
+          { id: "mat1", nombre: "Matemáticas I", prereq: [] },
+          { id: "prog1", nombre: "Programación I", prereq: [] },
+          { id: "fan1", nombre: "Fundamentos de Administración y Negocios I", prereq: [] },
+          { id: "com1", nombre: "Taller de Comunicación I", prereq: [] },
+          { id: "ing1", nombre: "Inglés I", prereq: [] },
+        ]
+      },
+      {
+        nombre: "Semestre II",
+        ramos: [
+          { id: "mat2", nombre: "Matemáticas II", prereq: ["mat1"] },
+          { id: "micro1", nombre: "Microeconomía I", prereq: [] },
+          { id: "fan2", nombre: "Fundamentos de Administración y Negocios II", prereq: ["fan1"] },
+          { id: "cont1", nombre: "Contabilidad I", prereq: [] },
+          { id: "ing2", nombre: "Inglés II", prereq: ["ing1"] },
+        ]
+      },
+      {
+        nombre: "Semestre III",
+        ramos: [
+          { id: "mat3", nombre: "Matemáticas III", prereq: ["mat2"] },
+          { id: "est1", nombre: "Estadística I", prereq: ["mat2", "prog1"] },
+          { id: "tecemp", nombre: "Tecnología y Empresas", prereq: ["prog1"] },
+          { id: "com2", nombre: "Taller de Comunicación II", prereq: ["com1"] },
+          { id: "ing3", nombre: "Inglés III", prereq: ["ing2"] },
+          { id: "macro1", nombre: "Macroeconomía I", prereq: ["mat2", "micro1"] },
+        ]
+      },
+      {
+        nombre: "Semestre IV",
+        ramos: [
+          { id: "est2", nombre: "Estadística II", prereq: ["est1"] },
+          { id: "micro2", nombre: "Microeconomía II", prereq: ["micro1", "mat2"] },
+          { id: "cont2", nombre: "Contabilidad II", prereq: ["cont1", "tecemp"] },
+          { id: "personas", nombre: "Personas y Equipos", prereq: ["fan2"] },
+          { id: "liderazgo", nombre: "Taller de Liderazgo", prereq: ["com2", "fan2"] },
+          { id: "ing4", nombre: "Inglés IV", prereq: ["ing3"] },
+        ]
+      },
+      {
+        nombre: "Semestre V",
+        ramos: [
+          { id: "eco1", nombre: "Econometría I", prereq: ["mat3", "est2"] },
+          { id: "macro2", nombre: "Macroeconomía II", prereq: ["mat3", "macro1"] },
+          { id: "fin1", nombre: "Finanzas I", prereq: ["cont2", "est2"] },
+          { id: "estrategia", nombre: "Estrategia", prereq: ["personas", "tecemp"] },
+          { id: "etica", nombre: "Taller de Ética", prereq: ["personas", "liderazgo"] },
+          { id: "ing5", nombre: "Inglés V", prereq: ["ing4"] },
+        ]
+      },
+      {
+        nombre: "Semestre VI",
+        ramos: [
+          { id: "ciencdatos", nombre: "Ciencia de Datos", prereq: ["eco1", "tecemp"] },
+          { id: "global", nombre: "Globalización y Sustentabilidad", prereq: ["est2", "macro2", "estrategia"] },
+          { id: "operaciones", nombre: "Gestión de Operaciones", prereq: ["est2", "estrategia"] },
+          { id: "marketing", nombre: "Marketing", prereq: ["est2", "estrategia"] },
+          { id: "cfg1", nombre: "CFG I", prereq: [] },
+        ]
+      },
+      {
+        nombre: "Semestre VII",
+        ramos: [
+          { id: "fundeconorg", nombre: "Fundamento Económico de la Organización", prereq: ["global", "micro2"] },
+          { id: "fin2", nombre: "Finanzas II", prereq: ["fin1", "ciencdatos"] },
+          { id: "rrhh", nombre: "Recursos Humanos", prereq: ["personas", "estrategia"] },
+          { id: "emprend", nombre: "Taller de Emprendimiento", prereq: ["marketing", "etica"] },
+          { id: "cfg2", nombre: "CFG II", prereq: [] },
+        ]
+      },
+      {
+        nombre: "Semestre VIII",
+        ramos: [
+          { id: "cdnegocios", nombre: "Ciencia de Datos para los Negocios", prereq: ["ciencdatos"] },
+          { id: "implestrat", nombre: "Implementación Estratégica", prereq: ["global", "fin2", "estrategia"] },
+          { id: "derecho", nombre: "Derecho para los Negocios", prereq: ["rrhh"] },
+          { id: "juegoneg", nombre: "Taller de Juegos de Negocios", prereq: ["fin1", "emprend"] },
+          { id: "cfg3", nombre: "CFG III", prereq: [] },
+        ]
+      },
+      {
+        nombre: "Semestre IX",
+        ramos: [
+          { id: "opt1", nombre: "Optativo Mención I", prereq: [] },
+          { id: "opt2", nombre: "Optativo Mención II", prereq: [] },
+          { id: "opt3", nombre: "Optativo Mención III", prereq: [] },
+          { id: "opt4", nombre: "Optativo Mención IV", prereq: [] },
+          { id: "cfg4", nombre: "CFG IV", prereq: [] },
+        ]
+      },
+      {
+        nombre: "Semestre X",
+        ramos: [
+          { id: "practica", nombre: "Práctica Profesional", prereq: [] },
+          { id: "portafolio", nombre: "Desarrollo Carrera y Portafolio", prereq: [] },
+        ]
+      }
+    ];
+
+    const contenedor = document.getElementById("contenedor");
+
+    semestres.forEach((sem) => {
+      const h2 = document.createElement("h2");
+      h2.textContent = sem.nombre;
+      contenedor.appendChild(h2);
+
+      const div = document.createElement("div");
+      div.classList.add("semestre");
+
+      sem.ramos.forEach((ramo) => {
+        const box = document.createElement("div");
+        box.className = "ramo";
+        box.id = ramo.id;
+        box.textContent = ramo.nombre;
+        div.appendChild(box);
+      });
+
+      contenedor.appendChild(div);
+    });
+
+    function actualizarEstado() {
+      const aprobados = Array.from(document.querySelectorAll(".ramo.done")).map(el => el.id);
+      semestres.forEach(sem => {
+        sem.ramos.forEach(ramo => {
+          const el = document.getElementById(ramo.id);
+          const puedeTomar = ramo.prereq.every(pr => aprobados.includes(pr));
+          if (!puedeTomar && !el.classList.contains("done") && ramo.prereq.length > 0) {
+            el.classList.add("locked");
+          } else {
+            el.classList.remove("locked");
+          }
+        });
+      });
+    }
+
+    document.querySelectorAll(".ramo").forEach(el => {
+      el.addEventListener("click", () => {
+        el.classList.toggle("done");
+        actualizarEstado();
+      });
+    });
+
+    actualizarEstado();
+  </script>
+</body>
+</html>
